@@ -19,6 +19,7 @@ const Player = forwardRef(
     {
       title,
       source,
+      qualityList,
       poster,
       style,
       themeColor,
@@ -50,6 +51,8 @@ const Player = forwardRef(
     const [bitrateIndex, setBitrateIndex] = useState();
     const { screen, window } = useDimensions();
     const currentAppState = useAppState();
+
+    const hasQuality = Array.isArray(qualityList) && qualityList.length;
 
     useImperativeHandle(ref, () => ({
       play: (play) => {
@@ -149,7 +152,13 @@ const Player = forwardRef(
     };
 
     const handleChangeBitrate = (newIndex) => {
+      if (hasQuality) return;
       setBitrateIndex(newIndex);
+    };
+
+    const handleChangeQuality = (newSource) => {
+      isChangeQuality.current = true;
+      changeSource(newSource);
     };
 
     const isOrientationLandscape = window.width > window.height;
@@ -229,10 +238,12 @@ const Player = forwardRef(
             setErrorObj(nativeEvent);
           }}
           onTXVodBitrateChange={({ nativeEvent }) => {
+            if (hasQuality) return;
             setBitrateIndex(nativeEvent.index);
             onChangeBitrate(nativeEvent);
           }}
           onTXVodBitrateReady={({ nativeEvent }) => {
+            if (hasQuality) return;
             setBitrateList(nativeEvent.bitrates);
           }}
         >
@@ -253,6 +264,7 @@ const Player = forwardRef(
             loadingObj={loadingObj}
             themeColor={themeColor}
             playSource={playSource}
+            qualityList={qualityList}
             bitrateList={bitrateList}
             bitrateIndex={bitrateIndex}
             onSlide={handleSlide}
@@ -263,6 +275,7 @@ const Player = forwardRef(
             onPressFullOut={handleFullScreenOut}
             onChangeConfig={handleChangeConfig}
             onChangeBitrate={handleChangeBitrate}
+            onChangeQuality={handleChangeQuality}
           />
         </TXViewPlayer>
       </View>
@@ -272,6 +285,12 @@ const Player = forwardRef(
 Player.propTypes = {
   ...TXViewPlayer.propTypes,
   source: PropTypes.string, // 播放地址
+  qualityList: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string, // 标清 高清
+      value: PropTypes.string, // 对应播放地址
+    }) // 播放列表
+  ),
   poster: Image.propTypes.source, // 封面图
   onFullScreen: PropTypes.func, // 全屏回调事件
   onCompletion: PropTypes.func, // 播放完成事件

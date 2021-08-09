@@ -30,7 +30,16 @@ const styles = StyleSheet.create({
   },
 });
 
-function QualityView({ visible, bitrateList, bitrateIndex, themeColor, onClose, onChange }) {
+function QualityView({
+  visible,
+  qualityList,
+  playSource,
+  bitrateList,
+  bitrateIndex,
+  themeColor,
+  onClose,
+  onChange,
+}) {
   if (!visible) {
     return null;
   }
@@ -45,8 +54,8 @@ function QualityView({ visible, bitrateList, bitrateIndex, themeColor, onClose, 
         <View style={styles.row}>
           <Text style={styles.textWhite}>画质:</Text>
           <ChooseList
-            data={chooseData}
-            defaultValue={bitrateIndex}
+            data={qualityList || chooseData}
+            defaultValue={playSource || bitrateIndex}
             themeColor={themeColor}
             onChange={onChange}
           />

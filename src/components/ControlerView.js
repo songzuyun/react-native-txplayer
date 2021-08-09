@@ -98,6 +98,7 @@ function ControlerView({
   onPressFullOut,
   onChangeConfig,
   onChangeBitrate,
+  onChangeQuality,
   onSlide,
   onCastClick,
 }) {
@@ -108,6 +109,8 @@ function ControlerView({
   const totalFormat = formatTime(total);
   const hasBitrate = Array.isArray(bitrateList) && bitrateList.length;
   const bitrate = bitrateList && bitrateList.find((o) => o.index === bitrateIndex);
+  const hasQuality = Array.isArray(qualityList) && qualityList.length;
+  const quality = qualityList && qualityList.find((o) => o.value === playSource);
   const [configObj, setConfigObj] = useState({
     setSpeed,
     setRenderMode,
@@ -115,6 +118,8 @@ function ControlerView({
     setMute,
   });
   const bitrateLabel = getBitrateLabel(bitrate) || '画质';
+  const { label: qualityLabel } = quality || { label: '画质' };
+  const finalQualityLabel = hasQuality ? qualityLabel : bitrateLabel;
 
   const { animateValue, bottomAnimate, headerAnimate, opacityAnimate } = useMemo(() => {
     const animateValue = new Animated.Value(0);
@@ -178,7 +183,7 @@ function ControlerView({
             style={[styles.textQuality, styles.iconLeft]}
             onPress={() => setQualityVisible(true)}
           >
-            {bitrateLabel}
+            {finalQualityLabel}
           </Text>
         )}
         {enableCast && (
@@ -253,11 +258,13 @@ function ControlerView({
       />
       <QualityView
         themeColor={themeColor}
-        playSource={playSource}
         visible={qualityVisible}
+        qualityList={qualityList}
+        playSource={playSource}
         bitrateList={bitrateList}
         bitrateIndex={bitrateIndex}
         onChange={(res) => {
+          onChangeQuality(res.value);
           onChangeBitrate(res.value);
           setQualityVisible(false);
         }}
