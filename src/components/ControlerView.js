@@ -178,7 +178,7 @@ function ControlerView({
         <LinearGradient style={StyleSheet.absoluteFill} colors={[GradientBlack, GradientWhite]} />
         {isFull && <ControlIcon onPress={onPressFullOut} name="left" />}
         <Text style={styles.textTitle}>{title}</Text>
-        {Boolean(hasBitrate && isFull) && (
+        {Boolean((hasQuality || hasBitrate) && isFull) && (
           <Text
             style={[styles.textQuality, styles.iconLeft]}
             onPress={() => setQualityVisible(true)}

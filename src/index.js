@@ -51,6 +51,7 @@ const Player = forwardRef(
     const [bitrateIndex, setBitrateIndex] = useState();
     const { screen, window } = useDimensions();
     const currentAppState = useAppState();
+    const isChangeQuality = useRef(false);
 
     const hasQuality = Array.isArray(qualityList) && qualityList.length;
 
@@ -76,6 +77,7 @@ const Player = forwardRef(
     // 处理切换资源
     useEffect(() => {
       if (source) {
+        isChangeQuality.current = false;
         changeSource(source);
       }
     }, [source]);
@@ -200,9 +202,13 @@ const Player = forwardRef(
             if (isPlaying) {
               playerRef.current.startPlay();
             }
-            setCurrent(0);
-            setBuffer(0);
-            onPrepare();
+            if (isChangeQuality.current) {
+              playerRef.current.seekTo(current);
+            } else {
+              setCurrent(0);
+              setBuffer(0);
+              onPrepare();
+            }
           }}
           onTXVodLoading={() => {
             setLoading(true);
