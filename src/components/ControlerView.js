@@ -15,6 +15,7 @@ import QualityView from './QualityView';
 const GradientWhite = 'rgba(0,0,0,0)';
 const GradientBlack = 'rgba(0,0,0,0.3)';
 const controlerHeight = 40;
+const controlerHeightFull = 80;
 const controlerDismissTime = 5000;
 const AnimateView = Animated.View;
 
@@ -173,6 +174,7 @@ function ControlerView({
         style={[
           styles.header,
           { opacity: opacityAnimate, transform: [{ translateY: headerAnimate }] },
+          isFull && { height: controlerHeightFull, paddingHorizontal: 50 },
         ]}
       >
         <LinearGradient style={StyleSheet.absoluteFill} colors={[GradientBlack, GradientWhite]} />
@@ -217,6 +219,7 @@ function ControlerView({
         style={[
           styles.bottom,
           { opacity: opacityAnimate, transform: [{ translateY: bottomAnimate }] },
+          isFull && { height: controlerHeightFull, paddingHorizontal: 50 },
         ]}
       >
         <LinearGradient style={StyleSheet.absoluteFill} colors={[GradientWhite, GradientBlack]} />
