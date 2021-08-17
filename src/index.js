@@ -29,6 +29,7 @@ const Player = forwardRef(
       onChangeBitrate,
       onProgress,
       onPrepare,
+      isLandscape,
       ...restProps
     },
     ref
@@ -42,7 +43,6 @@ const Player = forwardRef(
     const [isComplate, setIsComplate] = useState(false);
     const [isStopPlay, setIsStopPlay] = useState(false);
     const [isPlaying, setIsPlaying] = useState(setAutoPlay);
-    const [loadingObj, setLoadingObj] = useState({});
     const [total, setTotal] = useState(0);
     const [current, setCurrent] = useState(0);
     const [buffer, setBuffer] = useState(0);
@@ -100,7 +100,6 @@ const Player = forwardRef(
     const changeSource = (src) => {
       setPlaySource(src);
       setLoading(true);
-      setLoadingObj({});
       setError(false);
     };
 
@@ -154,7 +153,7 @@ const Player = forwardRef(
     };
 
     const handleChangeBitrate = (newIndex) => {
-      if (hasQuality) return;
+      setLoading(true);
       setBitrateIndex(newIndex);
     };
 
@@ -163,7 +162,7 @@ const Player = forwardRef(
       changeSource(newSource);
     };
 
-    const isOrientationLandscape = window.width > window.height;
+    const isOrientationLandscape = isLandscape;
 
     const fullscreenStyle = {
       position: 'absolute',
@@ -212,14 +211,9 @@ const Player = forwardRef(
           }}
           onTXVodLoading={() => {
             setLoading(true);
-            setLoadingObj({});
-          }}
-          onAliLoadingProgress={({ nativeEvent }) => {
-            setLoadingObj(nativeEvent);
           }}
           onTXVodLoadingEnd={() => {
             setLoading(false);
-            setLoadingObj({});
           }}
           onTXVodBegin={() => {
             setError(false);
@@ -267,7 +261,7 @@ const Player = forwardRef(
             isLoading={loading}
             errorObj={errorObj}
             isPlaying={isPlaying}
-            loadingObj={loadingObj}
+            loadingObj={{}}
             themeColor={themeColor}
             playSource={playSource}
             qualityList={qualityList}
@@ -307,6 +301,7 @@ Player.propTypes = {
   onChangeBitrate: PropTypes.func, // 切换清晰度
   onProgress: PropTypes.func, // 进度回调
   onPrepare: PropTypes.func, // 播放准备回调
+  isLandscape: PropTypes.bool, // 全屏是否横屏
 };
 
 Player.defaultProps = {
@@ -320,6 +315,7 @@ Player.defaultProps = {
   enableHardwareDecoder: false,
   setSpeed: 1.0,
   setRenderMode: 0,
+  isLandscape: true,
 };
 
 export default React.memo(Player);
