@@ -153,6 +153,7 @@ const Player = forwardRef(
     };
 
     const handleChangeBitrate = (newIndex) => {
+      if (hasQuality) return;
       setLoading(true);
       setBitrateIndex(newIndex);
     };
