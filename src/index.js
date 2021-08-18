@@ -187,9 +187,10 @@ const Player = forwardRef(
       height: isOrientationLandscape
         ? Math.min(window.width, window.height)
         : Math.max(window.width, window.height),
+      zIndex: 100,
     };
     return (
-      <View style={[styles.base, isFull ? fullscreenStyle : style]}>
+      <View style={[styles.base, isFull ? fullwindowStyle : style]}>
         <TXViewPlayer
           {...restProps}
           ref={playerRef}
