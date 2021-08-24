@@ -51,7 +51,8 @@ const Player = forwardRef(
     const [bitrateIndex, setBitrateIndex] = useState();
     const { screen, window } = useDimensions();
     const currentAppState = useAppState();
-    const isChangeQuality = useRef(false);
+    const isChangeQuality = useRef(false); // 切换清晰度
+    const isChangeQualityCurrent = useRef(0); // 切换清晰度当前时间
 
     const hasQuality = Array.isArray(qualityList) && qualityList.length;
 
@@ -78,12 +79,14 @@ const Player = forwardRef(
     useEffect(() => {
       if (source) {
         !hasQuality && (isChangeQuality.current = false);
+        !hasQuality && (isChangeQualityCurrent.current = 0);
         changeSource(source);
       }
     }, [source]);
 
     useEffect(() => {
       isChangeQuality.current = false;
+      isChangeQualityCurrent.current = 0;
     }, [qualityList]);
 
     useEffect(() => {
@@ -164,6 +167,7 @@ const Player = forwardRef(
 
     const handleChangeQuality = (newSource) => {
       isChangeQuality.current = true;
+      isChangeQualityCurrent.current = current;
       changeSource(newSource);
     };
 
@@ -208,8 +212,9 @@ const Player = forwardRef(
               playerRef.current.startPlay();
             }
             if (isChangeQuality.current) {
+              playerRef.current.seekTo(isChangeQualityCurrent.current);
               isChangeQuality.current = false;
-              playerRef.current.seekTo(current);
+              isChangeQualityCurrent.current = 0;
             } else {
               setCurrent(0);
               setBuffer(0);
@@ -230,7 +235,6 @@ const Player = forwardRef(
             setIsStart(true);
           }}
           onTXVodProgress={({ nativeEvent }) => {
-            if (isChangeQuality.current) return; // 切换清晰度后进度会变成0，导致seekTo为0
             setTotal(nativeEvent.duration);
             setCurrent(nativeEvent.progress);
             setBuffer(nativeEvent.buffered);
