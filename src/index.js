@@ -77,10 +77,14 @@ const Player = forwardRef(
     // 处理切换资源
     useEffect(() => {
       if (source) {
-        isChangeQuality.current = false;
+        !hasQuality && (isChangeQuality.current = false);
         changeSource(source);
       }
     }, [source]);
+
+    useEffect(() => {
+      isChangeQuality.current = false;
+    }, [qualityList]);
 
     useEffect(() => {
       if (currentAppState === 'background') {
@@ -204,6 +208,7 @@ const Player = forwardRef(
               playerRef.current.startPlay();
             }
             if (isChangeQuality.current) {
+              isChangeQuality.current = false;
               playerRef.current.seekTo(current);
             } else {
               setCurrent(0);
@@ -225,6 +230,7 @@ const Player = forwardRef(
             setIsStart(true);
           }}
           onTXVodProgress={({ nativeEvent }) => {
+            if (isChangeQuality.current) return; // 切换清晰度后进度会变成0，导致seekTo为0
             setTotal(nativeEvent.duration);
             setCurrent(nativeEvent.progress);
             setBuffer(nativeEvent.buffered);
