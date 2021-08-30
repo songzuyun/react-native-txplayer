@@ -199,14 +199,14 @@ const Player = forwardRef(
       zIndex: 100,
     };
     return (
-      <View style={[styles.base, isFull ? fullwindowStyle : style]}>
+      <View style={[styles.base, isFull ? fullscreenStyle : style]}>
         <TXViewPlayer
           {...restProps}
           ref={playerRef}
           source={playSource}
           setAutoPlay={setAutoPlay}
           selectBitrateIndex={bitrateIndex}
-          style={isFull ? fullwindowStyle : StyleSheet.absoluteFill}
+          style={StyleSheet.absoluteFill}
           onTXVodPrepare={() => {
             if (isPlaying) {
               playerRef.current.startPlay();
