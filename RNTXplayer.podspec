@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.author             = { "author" => "author@domain.cn" }
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/xuqianjin/react-native-txplayer.git", :tag => "master" }
-  s.source_files  = "RNTXplayer/**/*.{h,m}"
+  s.source_files  = "ios/RNTXplayer/*.{h,m}"
   s.requires_arc = true
 
 
