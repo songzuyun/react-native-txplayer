@@ -231,7 +231,7 @@ function ControlerView({
         <Slider
           progress={current}
           min={0}
-          max={total}
+          max={total-10} //减去10秒，1.拖到最后疫苗会闪退2.留一点播放时间
           cache={buffer}
           style={styles.bottomSlide}
           onSlidingComplete={(value) => {
