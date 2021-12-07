@@ -59,6 +59,8 @@
   _source = source;
   [self.player setupVideoWidget:self insertIndex:0];
   [self.player setConfig:self.config];
+  [self.player seek:0];
+  [self.player resume];
   [self.player startPlay:self.source];
 }
 -(void)setSetAutoPlay:(BOOL)setAutoPlay{
