@@ -80,6 +80,7 @@ const Player = forwardRef(
       if (source) {
         !hasQuality && (isChangeQuality.current = false);
         !hasQuality && (isChangeQualityCurrent.current = 0);
+        playerRef.current && playerRef.current.restartPlay();
         changeSource(source);
       }
     }, [source]);
