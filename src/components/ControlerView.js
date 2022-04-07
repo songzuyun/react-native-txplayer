@@ -1,8 +1,8 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
-import { Text, Animated, Easing, SafeAreaView, StyleSheet, Image } from 'react-native';
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+import { View, Text, Animated, Easing, SafeAreaView, StyleSheet, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Slider from './Slide';
-
+import { useDimensions } from '@react-native-community/hooks';
 import { formatTime, getBitrateLabel } from '../lib/utils';
 import useTimeout from '../lib/useTimeout';
 import PressView from './PressView';
@@ -11,6 +11,7 @@ import StateView from './StateView';
 import Progress from './Progress';
 import ConfigView from './ConfigView';
 import QualityView from './QualityView';
+import GestureView from './GestureView';
 
 const GradientWhite = 'rgba(0,0,0,0)';
 const GradientBlack = 'rgba(0,0,0,0.3)';
@@ -26,6 +27,7 @@ const styles = StyleSheet.create({
   },
   stateview: {
     flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -64,6 +66,17 @@ const styles = StyleSheet.create({
     flex: 0.8,
     marginHorizontal: 5,
   },
+  panResponder: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  seekText: {
+    color: 'white',
+    fontSize: 30,
+  },
 });
 
 function ControlerView({
@@ -87,6 +100,7 @@ function ControlerView({
   setRenderMode,
   setLoop,
   setMute,
+  setVolume,
   // ******
   isError,
   isLoading,
@@ -103,9 +117,13 @@ function ControlerView({
   onSlide,
   onCastClick,
 }) {
+  const { screen, window } = useDimensions();
   const [visible, setVisible] = useState(false);
   const [configVisible, setConfigVisible] = useState(false);
   const [qualityVisible, setQualityVisible] = useState(false);
+  const [currentPositon, setCurrentPositon] = useState(current);
+  const [showSeek, setShowSeek] = useState(false);
+  const currentPositonFormat = formatTime(currentPositon);
   const currentFormat = formatTime(current);
   const totalFormat = formatTime(total);
   const hasBitrate = Array.isArray(bitrateList) && bitrateList.length;
@@ -117,7 +135,99 @@ function ControlerView({
     setRenderMode,
     setLoop,
     setMute,
+    setVolume,
   });
+
+  // 在手势回调里不能直接使用属性和state
+  const totalRef = useRef(total);
+  const isFullRef = useRef(isFull);
+  const configObjRef = useRef({
+    setSpeed,
+    setRenderMode,
+    setLoop,
+    setMute,
+    setVolume,
+  });
+  useEffect(() => {
+    totalRef.current = total;
+    isFullRef.current = isFull;
+    configObjRef.current = {
+      setSpeed,
+      setRenderMode,
+      setLoop,
+      setMute,
+      setVolume,
+    };
+  }, [total, isFull, setSpeed, setRenderMode, setLoop, setMute, setVolume]);
+
+  const gestureMoveRef = useRef(false); // 拖动标记
+  const currentDxRef = useRef(0); //拖动时onPanResponderMove每次回调的dx（是一个累加的值）
+  const currentPositonRef = useRef(0); //拖动时当前播放位置，用于释放时seek（onSlide）
+
+  const onPanResponderMove = (e, gestureState) => {
+    const { dx, dy, x0, y0 } = gestureState;
+    const width = window.width;
+    // const width = isFullRef.current
+    //   ? Math.max(window.width, window.height)
+    //   : Math.min(window.width, window.height);
+    // const height = isFullRef.current
+    //   ? Math.min(window.width, window.height)
+    //   : Math.max(window.width, window.height);
+    // const widthE = width / 4;
+    // if (Math.abs(dy) > 5 && x0 < widthE) {
+    //   // 亮度
+    // }
+    // if (Math.abs(dy) > 5 && x0 > widthE * 3) {
+    //   // 声音
+    //   const setVolume = 1;
+    //   const newConfig = Object.assign({}, configObjRef.current, { setVolume });
+    //   setConfigObj(newConfig);
+    //   onChangeConfig(newConfig);
+    // }
+    // if (!gestureMoveRef.current && Math.abs(dx) > 5 && x0 >= widthE && x0 <= widthE * 3) {
+    if (!gestureMoveRef.current && Math.abs(dx) > 5) {
+      gestureMoveRef.current = true;
+    }
+    if (gestureMoveRef.current) {
+      const newDx = dx - currentDxRef.current; // 每次回调dx差值
+      const dt = 90 * (newDx / width);
+      setCurrentPositon((pre) => {
+        let next = pre + dt;
+        if (next < 0) {
+          next = 0;
+        }
+        if (next > totalRef.current) {
+          next = totalRef.current;
+        }
+        currentPositonRef.current = next;
+        return next;
+      });
+      setShowSeek(true);
+    }
+    currentDxRef.current = dx;
+  };
+
+  const onPanResponderRelease = (e, gestureState) => {
+    const { dx, dy } = gestureState;
+    if (gestureMoveRef.current) {
+      onSlide(parseInt(currentPositonRef.current));
+    }
+    if (dx === 0 && dy === 0) {
+      handlePressPlayer();
+    }
+    gestureMoveRef.current = false;
+    currentDxRef.current = 0;
+    currentPositonRef.current = 0;
+    setShowSeek(false);
+  };
+
+  // 不拖动时要更新当前播放位置
+  useEffect(() => {
+    if (!gestureMoveRef.current) {
+      setCurrentPositon(current);
+    }
+  }, [current]);
+
   const bitrateLabel = getBitrateLabel(bitrate) || '画质';
   const { label: qualityLabel } = quality || { label: '画质' };
   const finalQualityLabel = hasQuality ? qualityLabel : bitrateLabel;
@@ -158,13 +268,15 @@ function ControlerView({
   }, [visible, animateValue]);
 
   const handlePressPlayer = () => {
-    if (visible) {
-      setVisible(false);
-      clear();
-    } else {
-      setVisible(true);
-      set();
-    }
+    setVisible((pre) => {
+      if (pre) {
+        clear();
+        return false;
+      } else {
+        set();
+        return true;
+      }
+    });
   };
 
   return (
@@ -203,7 +315,19 @@ function ControlerView({
           />
         )}
       </AnimateView>
-      <PressView style={styles.stateview} onPress={handlePressPlayer} activeOpacity={1}>
+
+      <View style={styles.stateview} activeOpacity={1}>
+        <GestureView
+          onPanResponderMove={onPanResponderMove}
+          onPanResponderRelease={onPanResponderRelease}
+        >
+          {showSeek && (
+            <Text
+              style={styles.seekText}
+            >{`${currentPositonFormat.M}:${currentPositonFormat.S}`}</Text>
+          )}
+        </GestureView>
+
         <StateView
           isError={isError}
           isLoading={isLoading}
@@ -214,7 +338,8 @@ function ControlerView({
           onPressPlay={onPressPlay}
           onPressReload={onPressReload}
         />
-      </PressView>
+      </View>
+
       <AnimateView
         style={[
           styles.bottom,
@@ -227,11 +352,11 @@ function ControlerView({
           onPress={isPlaying ? onPressPause : onPressPlay}
           name={isPlaying ? 'pausecircleo' : 'playcircleo'}
         />
-        <Text style={styles.textTime}>{`${currentFormat.M}:${currentFormat.S}`}</Text>
+        <Text style={styles.textTime}>{`${currentPositonFormat.M}:${currentPositonFormat.S}`}</Text>
         <Slider
-          progress={current}
+          progress={currentPositon}
           min={0}
-          max={total-10} //减去10秒，1.拖到最后疫苗会闪退2.留一点播放时间
+          max={total - 10} //减去10秒，1.拖到最后疫苗会闪退2.留一点播放时间
           cache={buffer}
           style={styles.bottomSlide}
           onSlidingComplete={(value) => {
@@ -247,7 +372,7 @@ function ControlerView({
           />
         )}
       </AnimateView>
-      <Progress disable={visible} value={current} maxValue={total} themeColor={themeColor} />
+      <Progress disable={visible} value={currentPositon} maxValue={total} themeColor={themeColor} />
       <ConfigView
         config={configObj}
         visible={configVisible}

@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     maxWidth: '50%',
   },
   stateViewError: {
-    width: 200,
+    // width: 200,
     alignItems: 'center',
   },
   textError: {
@@ -69,7 +69,7 @@ function StateView({
           style={styles.textError}
           numberOfLines={1}
           ellipsizeMode="tail"
-        >{`播放出错:${message}`}</Text>
+          >{`播放出错:${message}`}</Text>
         <Button
           title="重试"
           titleStyle={{ fontSize: 12 }}

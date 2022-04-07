@@ -26,10 +26,17 @@ const Player = forwardRef(
       onFullScreen,
       onCompletion,
       setAutoPlay,
+      setLoop,
       onChangeBitrate,
+      onLoadingBegin,
+      onLoadingEnd,
       onProgress,
       onPrepare,
+      onRenderingStart,
+      onError,
       isLandscape,
+      initFull,
+      showControlerView,
       ...restProps
     },
     ref
@@ -39,7 +46,7 @@ const Player = forwardRef(
     const [error, setError] = useState(false);
     const [errorObj, setErrorObj] = useState({});
     const [loading, setLoading] = useState(true);
-    const [isFull, setIsFull] = useState(false);
+    const [isFull, setIsFull] = useState(initFull);
     const [isComplate, setIsComplate] = useState(false);
     const [isStopPlay, setIsStopPlay] = useState(false);
     const [isPlaying, setIsPlaying] = useState(setAutoPlay);
@@ -206,6 +213,7 @@ const Player = forwardRef(
           ref={playerRef}
           source={playSource}
           setAutoPlay={setAutoPlay}
+          setLoop={setLoop}
           selectBitrateIndex={bitrateIndex}
           style={StyleSheet.absoluteFill}
           onTXVodPrepare={() => {
@@ -224,9 +232,11 @@ const Player = forwardRef(
           }}
           onTXVodLoading={() => {
             setLoading(true);
+            onLoadingBegin();
           }}
           onTXVodLoadingEnd={() => {
             setLoading(false);
+            onLoadingEnd();
           }}
           onTXVodBegin={() => {
             setError(false);
@@ -234,6 +244,7 @@ const Player = forwardRef(
             setIsStopPlay(false);
             setIsPlaying(true);
             setIsStart(true);
+            onRenderingStart();
           }}
           onTXVodProgress={({ nativeEvent }) => {
             setTotal(nativeEvent.duration);
@@ -249,6 +260,7 @@ const Player = forwardRef(
           onTXVodError={({ nativeEvent }) => {
             setError(true);
             setErrorObj(nativeEvent);
+            onError()
           }}
           onTXVodBitrateChange={({ nativeEvent }) => {
             if (hasQuality) return;
@@ -261,35 +273,37 @@ const Player = forwardRef(
           }}
         >
           <StatusBar hidden={isFull} />
-          <ControlerView
-            {...restProps}
-            title={title}
-            isFull={isFull}
-            current={current}
-            buffer={buffer}
-            total={total}
-            isError={error}
-            poster={poster}
-            isStart={isStart}
-            isLoading={loading}
-            errorObj={errorObj}
-            isPlaying={isPlaying}
-            loadingObj={{}}
-            themeColor={themeColor}
-            playSource={playSource}
-            qualityList={qualityList}
-            bitrateList={bitrateList}
-            bitrateIndex={bitrateIndex}
-            onSlide={handleSlide}
-            onPressPlay={handlePlay}
-            onPressPause={handlePause}
-            onPressReload={handleReload}
-            onPressFullIn={handleFullScreenIn}
-            onPressFullOut={handleFullScreenOut}
-            onChangeConfig={handleChangeConfig}
-            onChangeBitrate={handleChangeBitrate}
-            onChangeQuality={handleChangeQuality}
-          />
+          {showControlerView && (
+            <ControlerView
+              {...restProps}
+              title={title}
+              isFull={isFull}
+              current={current}
+              buffer={buffer}
+              total={total}
+              isError={error}
+              poster={poster}
+              isStart={isStart}
+              isLoading={loading}
+              errorObj={errorObj}
+              isPlaying={isPlaying}
+              loadingObj={{}}
+              themeColor={themeColor}
+              playSource={playSource}
+              qualityList={qualityList}
+              bitrateList={bitrateList}
+              bitrateIndex={bitrateIndex}
+              onSlide={handleSlide}
+              onPressPlay={handlePlay}
+              onPressPause={handlePause}
+              onPressReload={handleReload}
+              onPressFullIn={handleFullScreenIn}
+              onPressFullOut={handleFullScreenOut}
+              onChangeConfig={handleChangeConfig}
+              onChangeBitrate={handleChangeBitrate}
+              onChangeQuality={handleChangeQuality}
+            />
+          )}
         </TXViewPlayer>
       </View>
     );
@@ -312,9 +326,15 @@ Player.propTypes = {
   enableCast: PropTypes.bool, // 是否显示投屏按钮
   onCastClick: PropTypes.func, // 投屏按钮点击事件
   onChangeBitrate: PropTypes.func, // 切换清晰度
+  onLoadingBegin: PropTypes.func, // 开始加载回调
+  onLoadingEnd: PropTypes.func, // 加载结束回调
   onProgress: PropTypes.func, // 进度回调
   onPrepare: PropTypes.func, // 播放准备回调
+  onRenderingStart: PropTypes.func, // 开始渲染播放回调
+  onError: PropTypes.func, // 播放出错
   isLandscape: PropTypes.bool, // 全屏是否横屏
+  initFull: PropTypes.bool, // 初始是否全屏
+  showControlerView: PropTypes.bool, // 是否显示控制层
 };
 
 Player.defaultProps = {
@@ -322,13 +342,19 @@ Player.defaultProps = {
   onCompletion: () => {},
   onCastClick: () => {},
   onChangeBitrate: () => {},
+  onLoadingBegin: () => {},
+  onLoadingEnd: () => {},
   onProgress: () => {},
   onPrepare: () => {},
+  onRenderingStart: () => {},
+  onError: () => {},
   themeColor: '#F85959',
   enableHardwareDecoder: false,
   setSpeed: 1.0,
   setRenderMode: 0,
   isLandscape: true,
+  initFull: false,
+  showControlerView: true,
 };
 
 export default React.memo(Player);
