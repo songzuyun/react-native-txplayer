@@ -211,8 +211,7 @@ function ControlerView({
     const { dx, dy } = gestureState;
     if (gestureMoveRef.current) {
       onSlide(parseInt(currentPositonRef.current));
-    }
-    if (dx === 0 && dy === 0) {
+    } else {
       handlePressPlayer();
     }
     gestureMoveRef.current = false;
