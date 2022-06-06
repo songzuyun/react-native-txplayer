@@ -56,7 +56,7 @@ const Player = forwardRef(
     const [isStart, setIsStart] = useState(false);
     const [bitrateList, setBitrateList] = useState([]);
     const [bitrateIndex, setBitrateIndex] = useState();
-    const { screen, window } = useDimensions();
+    const { window } = useDimensions();
     const currentAppState = useAppState();
     const isChangeQuality = useRef(false); // 切换清晰度
     const isChangeQualityCurrent = useRef(0); // 切换清晰度当前时间
@@ -181,19 +181,6 @@ const Player = forwardRef(
 
     const isOrientationLandscape = isLandscape;
 
-    const fullscreenStyle = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: isOrientationLandscape
-        ? Math.max(screen.width, screen.height)
-        : Math.min(screen.width, screen.height),
-      height: isOrientationLandscape
-        ? Math.min(screen.width, screen.height)
-        : Math.max(screen.width, screen.height),
-      zIndex: 100,
-    };
-
     const fullwindowStyle = {
       position: 'absolute',
       top: 0,
@@ -207,7 +194,7 @@ const Player = forwardRef(
       zIndex: 100,
     };
     return (
-      <View style={[styles.base, isFull ? fullscreenStyle : style]}>
+      <View style={[styles.base, isFull ? fullwindowStyle : style]}>
         <TXViewPlayer
           {...restProps}
           ref={playerRef}
@@ -260,7 +247,7 @@ const Player = forwardRef(
           onTXVodError={({ nativeEvent }) => {
             setError(true);
             setErrorObj(nativeEvent);
-            onError()
+            onError();
           }}
           onTXVodBitrateChange={({ nativeEvent }) => {
             if (hasQuality) return;
