@@ -23,6 +23,7 @@ public class TXSurfaceView extends FrameLayout {
         super(context);
         setupLayoutHack();
         txyunVodPlayer = new TXVodPlayer(context);
+        txyunVodPlayer.enableHardwareDecode(false);
         txyunVoidView = new TXCloudVideoView(context);
         txyunVodPlayer.setPlayerView(txyunVoidView);
         addView(txyunVoidView);
