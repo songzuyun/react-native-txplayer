@@ -56,7 +56,7 @@ const Player = forwardRef(
     const [isStart, setIsStart] = useState(false);
     const [bitrateList, setBitrateList] = useState([]);
     const [bitrateIndex, setBitrateIndex] = useState();
-    const { window } = useDimensions();
+    const { window, screen } = useDimensions();
     const currentAppState = useAppState();
     const isChangeQuality = useRef(false); // 切换清晰度
     const isChangeQualityCurrent = useRef(0); // 切换清晰度当前时间
@@ -179,119 +179,129 @@ const Player = forwardRef(
       changeSource(newSource);
     };
 
-    const isOrientationLandscape = isLandscape;
+    const screenWidth = Math.max(screen.width, screen.height);
+    const windowWidth = Math.max(window.width, window.height);
 
-    const fullwindowStyle = {
+    const screenHeight = Math.min(screen.width, screen.height);
+    const windowHeight = Math.min(window.width, window.height);
+
+    //兼容全面屏
+    const fullWindowStyle = {
       position: 'absolute',
       top: 0,
       left: 0,
-      width: isOrientationLandscape
-        ? Math.max(window.width, window.height)
-        : Math.min(window.width, window.height),
-      height: isOrientationLandscape
-        ? Math.min(window.width, window.height)
-        : Math.max(window.width, window.height),
+      width: Math.min(screenWidth, windowWidth),
+      height: Math.min(screenHeight, windowHeight),
       zIndex: 100,
     };
     return (
-      <View style={[styles.base, isFull ? fullwindowStyle : style]}>
-        <TXViewPlayer
-          {...restProps}
-          ref={playerRef}
-          source={playSource}
-          setAutoPlay={setAutoPlay}
-          setLoop={setLoop}
-          selectBitrateIndex={bitrateIndex}
-          style={StyleSheet.absoluteFill}
-          onTXVodPrepare={() => {
-            if (isPlaying) {
-              playerRef.current.startPlay();
-            }
-            if (isChangeQuality.current) {
-              playerRef.current.seekTo(isChangeQualityCurrent.current);
-              isChangeQuality.current = false;
-              isChangeQualityCurrent.current = 0;
-            } else {
-              setCurrent(0);
-              setBuffer(0);
-              onPrepare();
-            }
-          }}
-          onTXVodLoading={() => {
-            setLoading(true);
-            onLoadingBegin();
-          }}
-          onTXVodLoadingEnd={() => {
-            setLoading(false);
-            onLoadingEnd();
-          }}
-          onTXVodBegin={() => {
-            setError(false);
-            setLoading(false);
-            setIsStopPlay(false);
-            setIsPlaying(true);
-            setIsStart(true);
-            onRenderingStart();
-          }}
-          onTXVodProgress={({ nativeEvent }) => {
-            setTotal(nativeEvent.duration);
-            setCurrent(nativeEvent.progress);
-            setBuffer(nativeEvent.buffered);
-            onProgress(nativeEvent);
-          }}
-          onTXVodEnd={() => {
-            setIsComplate(true);
-            setIsPlaying(false);
-            onCompletion();
-          }}
-          onTXVodError={({ nativeEvent }) => {
-            setError(true);
-            setErrorObj(nativeEvent);
-            onError();
-          }}
-          onTXVodBitrateChange={({ nativeEvent }) => {
-            if (hasQuality) return;
-            setBitrateIndex(nativeEvent.index);
-            onChangeBitrate(nativeEvent);
-          }}
-          onTXVodBitrateReady={({ nativeEvent }) => {
-            if (hasQuality) return;
-            setBitrateList(nativeEvent.bitrates);
-          }}
-        >
-          <StatusBar hidden={isFull} />
-          {showControlerView && (
-            <ControlerView
-              {...restProps}
-              title={title}
-              isFull={isFull}
-              current={current}
-              buffer={buffer}
-              total={total}
-              isError={error}
-              poster={poster}
-              isStart={isStart}
-              isLoading={loading}
-              errorObj={errorObj}
-              isPlaying={isPlaying}
-              loadingObj={{}}
-              themeColor={themeColor}
-              playSource={playSource}
-              qualityList={qualityList}
-              bitrateList={bitrateList}
-              bitrateIndex={bitrateIndex}
-              onSlide={handleSlide}
-              onPressPlay={handlePlay}
-              onPressPause={handlePause}
-              onPressReload={handleReload}
-              onPressFullIn={handleFullScreenIn}
-              onPressFullOut={handleFullScreenOut}
-              onChangeConfig={handleChangeConfig}
-              onChangeBitrate={handleChangeBitrate}
-              onChangeQuality={handleChangeQuality}
-            />
-          )}
-        </TXViewPlayer>
+      <View
+        style={{
+          zIndex: 999,
+          width: isFull ? Math.max(screenWidth, windowWidth) : style.width,
+          height: isFull ? Math.max(screenHeight, windowHeight) : style.height,
+          backgroundColor: 'black',
+        }}
+      >
+        <View style={[styles.base, isFull ? fullWindowStyle : style]}>
+          <TXViewPlayer
+            {...restProps}
+            ref={playerRef}
+            source={playSource}
+            setAutoPlay={setAutoPlay}
+            setLoop={setLoop}
+            selectBitrateIndex={bitrateIndex}
+            style={StyleSheet.absoluteFill}
+            onTXVodPrepare={() => {
+              if (isPlaying) {
+                playerRef.current.startPlay();
+              }
+              if (isChangeQuality.current) {
+                playerRef.current.seekTo(isChangeQualityCurrent.current);
+                isChangeQuality.current = false;
+                isChangeQualityCurrent.current = 0;
+              } else {
+                setCurrent(0);
+                setBuffer(0);
+                onPrepare();
+              }
+            }}
+            onTXVodLoading={() => {
+              setLoading(true);
+              onLoadingBegin();
+            }}
+            onTXVodLoadingEnd={() => {
+              setLoading(false);
+              onLoadingEnd();
+            }}
+            onTXVodBegin={() => {
+              setError(false);
+              setLoading(false);
+              setIsStopPlay(false);
+              setIsPlaying(true);
+              setIsStart(true);
+              onRenderingStart();
+            }}
+            onTXVodProgress={({ nativeEvent }) => {
+              setTotal(nativeEvent.duration);
+              setCurrent(nativeEvent.progress);
+              setBuffer(nativeEvent.buffered);
+              onProgress(nativeEvent);
+            }}
+            onTXVodEnd={() => {
+              setIsComplate(true);
+              setIsPlaying(false);
+              onCompletion();
+            }}
+            onTXVodError={({ nativeEvent }) => {
+              setError(true);
+              setErrorObj(nativeEvent);
+              onError();
+            }}
+            onTXVodBitrateChange={({ nativeEvent }) => {
+              if (hasQuality) return;
+              setBitrateIndex(nativeEvent.index);
+              onChangeBitrate(nativeEvent);
+            }}
+            onTXVodBitrateReady={({ nativeEvent }) => {
+              if (hasQuality) return;
+              setBitrateList(nativeEvent.bitrates);
+            }}
+          >
+            <StatusBar hidden={isFull} />
+            {showControlerView && (
+              <ControlerView
+                {...restProps}
+                title={title}
+                isFull={isFull}
+                current={current}
+                buffer={buffer}
+                total={total}
+                isError={error}
+                poster={poster}
+                isStart={isStart}
+                isLoading={loading}
+                errorObj={errorObj}
+                isPlaying={isPlaying}
+                loadingObj={{}}
+                themeColor={themeColor}
+                playSource={playSource}
+                qualityList={qualityList}
+                bitrateList={bitrateList}
+                bitrateIndex={bitrateIndex}
+                onSlide={handleSlide}
+                onPressPlay={handlePlay}
+                onPressPause={handlePause}
+                onPressReload={handleReload}
+                onPressFullIn={handleFullScreenIn}
+                onPressFullOut={handleFullScreenOut}
+                onChangeConfig={handleChangeConfig}
+                onChangeBitrate={handleChangeBitrate}
+                onChangeQuality={handleChangeQuality}
+              />
+            )}
+          </TXViewPlayer>
+        </View>
       </View>
     );
   }
