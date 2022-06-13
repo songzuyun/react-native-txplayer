@@ -76,6 +76,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 30,
   },
+  leftBackContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 60,
+    height: 40,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 function ControlerView({
@@ -290,7 +300,7 @@ function ControlerView({
         ]}
       >
         <LinearGradient style={StyleSheet.absoluteFill} colors={[GradientBlack, GradientWhite]} />
-        {(isFull||isShowLeftBack) && <ControlIcon onPress={isFull?onPressFullOut:onPressBack} name="left" />}
+        {isFull && <ControlIcon onPress={onPressFullOut} name="left" />}
         <Text style={styles.textTitle}>{title}</Text>
         {Boolean((hasQuality || hasBitrate) && isFull) && (
           <Text
@@ -315,6 +325,11 @@ function ControlerView({
           />
         )}
       </AnimateView>
+      {!isFull && isShowLeftBack && (
+        <View style={styles.leftBackContainer}>
+          <ControlIcon onPress={onPressBack} name="left" />
+        </View>
+      )}
 
       <View style={styles.stateview} activeOpacity={1}>
         <GestureView
