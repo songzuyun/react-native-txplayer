@@ -37,6 +37,8 @@ const Player = forwardRef(
       isLandscape,
       initFull,
       showControlerView,
+      isShowLeftBack,
+      onPressBack,
       ...restProps
     },
     ref
@@ -163,6 +165,10 @@ const Player = forwardRef(
       showNavigationBar();
     };
 
+    const handlePressBack = () => {
+      onPressBack && onPressBack();
+    };
+
     const handleChangeConfig = (config) => {
       playerRef.current.setNativeProps(config);
     };
@@ -192,7 +198,6 @@ const Player = forwardRef(
       left: 0,
       width: Math.min(screenWidth, windowWidth),
       height: Math.min(screenHeight, windowHeight),
-      zIndex: 100,
     };
     return (
       <View
@@ -274,6 +279,7 @@ const Player = forwardRef(
                 {...restProps}
                 title={title}
                 isFull={isFull}
+                isShowLeftBack={isShowLeftBack}
                 current={current}
                 buffer={buffer}
                 total={total}
@@ -298,6 +304,7 @@ const Player = forwardRef(
                 onChangeConfig={handleChangeConfig}
                 onChangeBitrate={handleChangeBitrate}
                 onChangeQuality={handleChangeQuality}
+                onPressBack={handlePressBack}
               />
             )}
           </TXViewPlayer>
@@ -332,6 +339,8 @@ Player.propTypes = {
   isLandscape: PropTypes.bool, // 全屏是否横屏
   initFull: PropTypes.bool, // 初始是否全屏
   showControlerView: PropTypes.bool, // 是否显示控制层
+  isShowLeftBack: PropTypes.bool, // 是否显示左返回按钮
+  onPressBack: PropTypes.func, // 返回回调
 };
 
 Player.defaultProps = {
@@ -352,6 +361,8 @@ Player.defaultProps = {
   isLandscape: true,
   initFull: false,
   showControlerView: true,
+  isShowLeftBack: false,
+  onPressBack: () => {},
 };
 
 export default React.memo(Player);

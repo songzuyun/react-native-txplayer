@@ -115,6 +115,8 @@ function ControlerView({
   onChangeQuality,
   onSlide,
   onCastClick,
+  isShowLeftBack,
+  onPressBack,
 }) {
   const { screen, window } = useDimensions();
   const [visible, setVisible] = useState(false);
@@ -288,7 +290,7 @@ function ControlerView({
         ]}
       >
         <LinearGradient style={StyleSheet.absoluteFill} colors={[GradientBlack, GradientWhite]} />
-        {isFull && <ControlIcon onPress={onPressFullOut} name="left" />}
+        {(isFull||isShowLeftBack) && <ControlIcon onPress={isFull?onPressFullOut:onPressBack} name="left" />}
         <Text style={styles.textTitle}>{title}</Text>
         {Boolean((hasQuality || hasBitrate) && isFull) && (
           <Text
