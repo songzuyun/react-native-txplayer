@@ -225,7 +225,7 @@ function ControlerView({
   }, [total, isFull, isPlaying, setSpeed, setRenderMode, setLoop, setMute, setVolume]);
 
   //获取声音、亮度初始值
-  useEffect(async () => {
+  useEffect(() => {
     SystemSetting.getAppBrightness().then((res) => {
       setBrightnessValue(res);
     });
