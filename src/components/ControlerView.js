@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, Animated, Easing, SafeAreaView, StyleSheet, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import SystemSetting from 'react-native-system-setting';
+import { throttle } from 'lodash';
+import dayjs from 'dayjs';
 import Slider from './Slide';
 import { useDimensions } from '@react-native-community/hooks';
 import { formatTime, getBitrateLabel } from '../lib/utils';
@@ -17,6 +20,7 @@ const GradientWhite = 'rgba(0,0,0,0)';
 const GradientBlack = 'rgba(0,0,0,0.3)';
 const controlerHeight = 40;
 const controlerDismissTime = 5000;
+const volumeDismissTime = 2000;
 const AnimateView = Animated.View;
 
 const styles = StyleSheet.create({
@@ -86,6 +90,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  volumeContainer: {
+    position: 'absolute',
+    top: 10,
+    left: 0,
+    right: 0,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  volumeBg: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  volumeProgressCon: {
+    backgroundColor: '#eee',
+    height: 4,
+    width: 150,
+    marginLeft: 6,
+  },
+  volumeProgress: {
+    backgroundColor: '#f85959',
+    height: 4,
+    width: '50%',
+  },
 });
 
 function ControlerView({
@@ -134,6 +168,10 @@ function ControlerView({
   const [qualityVisible, setQualityVisible] = useState(false);
   const [currentPositon, setCurrentPositon] = useState(current);
   const [showSeek, setShowSeek] = useState(false);
+  const [showVolume, setShowVolume] = useState(false);
+  const [showBrightness, setShowBrightness] = useState(false);
+  const [volumeValue, setVolumeValue] = useState();
+  const [brightnessValue, setBrightnessValue] = useState();
   const currentPositonFormat = formatTime(currentPositon);
   const currentFormat = formatTime(current);
   const totalFormat = formatTime(total);
@@ -149,9 +187,22 @@ function ControlerView({
     setVolume,
   });
 
-  // 在手势回调里不能直接使用属性和state
+  const [isReady, clear, set] = useTimeout(() => {
+    setVisible(false);
+  }, controlerDismissTime);
+
+  const [volumeIsReady, volumeClear, volumeSet] = useTimeout(() => {
+    setShowVolume(false);
+  }, volumeDismissTime);
+
+  const [brightnessIsReady, brightnessClear, brightnessSet] = useTimeout(() => {
+    setShowBrightness(false);
+  }, volumeDismissTime);
+
+  // 在手势回调里不能直接使用props和state
   const totalRef = useRef(total);
   const isFullRef = useRef(isFull);
+  const isPlayingRef = useRef(isPlaying);
   const configObjRef = useRef({
     setSpeed,
     setRenderMode,
@@ -159,9 +210,11 @@ function ControlerView({
     setMute,
     setVolume,
   });
+
   useEffect(() => {
     totalRef.current = total;
     isFullRef.current = isFull;
+    isPlayingRef.current = isPlaying;
     configObjRef.current = {
       setSpeed,
       setRenderMode,
@@ -169,37 +222,103 @@ function ControlerView({
       setMute,
       setVolume,
     };
-  }, [total, isFull, setSpeed, setRenderMode, setLoop, setMute, setVolume]);
+  }, [total, isFull, isPlaying, setSpeed, setRenderMode, setLoop, setMute, setVolume]);
 
-  const gestureMoveRef = useRef(false); // 拖动标记
-  const currentDxRef = useRef(0); //拖动时onPanResponderMove每次回调的dx（是一个累加的值）
+  //获取声音、亮度初始值
+  useEffect(async () => {
+    SystemSetting.getAppBrightness().then((res) => {
+      setBrightnessValue(res);
+    });
+    SystemSetting.getVolume().then((res) => {
+      setVolumeValue(res);
+    });
+  }, []);
+
+  const gestureProgressRef = useRef(false); // 快进手势标记
+  const gestureVolumeRef = useRef(false); // 声音手势标记
+  const gestureBrightnessRef = useRef(false); // 亮度手势标记
+  const currentDxRef = useRef(0); //拖动时onPanResponderMove每次回调的dx（dx是一个累加的值）
+  const currentDyRef = useRef(0); //拖动时onPanResponderMove每次回调的dy（dy是一个累加的值）
   const currentPositonRef = useRef(0); //拖动时当前播放位置，用于释放时seek（onSlide）
+  const clickTimeRef = useRef(); //点击时间
+  const timerRef = useRef(); //定时器（区分单击还是双击）
 
   const onPanResponderMove = (e, gestureState) => {
     const { dx, dy, x0, y0 } = gestureState;
     const width = window.width;
-    // const width = isFullRef.current
-    //   ? Math.max(window.width, window.height)
-    //   : Math.min(window.width, window.height);
-    // const height = isFullRef.current
-    //   ? Math.min(window.width, window.height)
-    //   : Math.max(window.width, window.height);
-    // const widthE = width / 4;
-    // if (Math.abs(dy) > 5 && x0 < widthE) {
-    //   // 亮度
-    // }
-    // if (Math.abs(dy) > 5 && x0 > widthE * 3) {
-    //   // 声音
-    //   const setVolume = 1;
-    //   const newConfig = Object.assign({}, configObjRef.current, { setVolume });
-    //   setConfigObj(newConfig);
-    //   onChangeConfig(newConfig);
-    // }
-    // if (!gestureMoveRef.current && Math.abs(dx) > 5 && x0 >= widthE && x0 <= widthE * 3) {
-    if (!gestureMoveRef.current && Math.abs(dx) > 5) {
-      gestureMoveRef.current = true;
+    const height = 200;
+    const widthE = width / 4;
+    // 亮度
+    if (
+      !gestureProgressRef.current &&
+      !gestureBrightnessRef.current &&
+      !gestureVolumeRef.current &&
+      Math.abs(dy) > 5 &&
+      x0 < widthE * 2
+    ) {
+      gestureBrightnessRef.current = true;
     }
-    if (gestureMoveRef.current) {
+    // 声音
+    if (
+      !gestureProgressRef.current &&
+      !gestureBrightnessRef.current &&
+      !gestureVolumeRef.current &&
+      Math.abs(dy) > 5 &&
+      x0 > widthE * 2
+    ) {
+      gestureVolumeRef.current = true;
+    }
+    // 快进
+    if (
+      !gestureProgressRef.current &&
+      !gestureBrightnessRef.current &&
+      !gestureVolumeRef.current &&
+      Math.abs(dx) > 5
+    ) {
+      gestureProgressRef.current = true;
+    }
+    // 亮度
+    if (gestureBrightnessRef.current) {
+      const newDy = dy - currentDyRef.current; // 每次回调dy差值
+      const dt = -1 * (newDy / height);
+      setBrightnessValue((pre) => {
+        let next = pre + dt;
+        if (next < 0) {
+          next = 0;
+        }
+        if (next > 1) {
+          next = 1;
+        }
+        SystemSetting.setAppBrightness(next);
+        return next;
+      });
+      setShowVolume(false);
+      setShowBrightness(true);
+      brightnessSet();
+      volumeClear();
+    }
+    // 声音
+    if (gestureVolumeRef.current) {
+      const newDy = dy - currentDyRef.current; // 每次回调dy差值
+      const dt = -1 * (newDy / height);
+      setVolumeValue((pre) => {
+        let next = pre + dt;
+        if (next < 0) {
+          next = 0;
+        }
+        if (next > 1) {
+          next = 1;
+        }
+        SystemSetting.setVolume(next);
+        return next;
+      });
+      setShowBrightness(false);
+      setShowVolume(true);
+      volumeSet();
+      brightnessClear();
+    }
+    // 快进
+    if (gestureProgressRef.current) {
       const newDx = dx - currentDxRef.current; // 每次回调dx差值
       const dt = 90 * (newDx / width);
       setCurrentPositon((pre) => {
@@ -214,26 +333,39 @@ function ControlerView({
         return next;
       });
       setShowSeek(true);
+      setShowVolume(false);
+      setShowBrightness(false);
     }
+    //更新上一次dx、dy
     currentDxRef.current = dx;
+    currentDyRef.current = dy;
   };
 
   const onPanResponderRelease = (e, gestureState) => {
     const { dx, dy } = gestureState;
-    if (gestureMoveRef.current) {
+    if (gestureProgressRef.current) {
       onSlide(parseInt(currentPositonRef.current));
+    } else if (gestureVolumeRef.current) {
+    } else if (gestureBrightnessRef.current) {
     } else {
       handlePressPlayer();
+      setShowVolume(false);
+      setShowBrightness(false);
+      brightnessClear();
+      volumeClear();
     }
-    gestureMoveRef.current = false;
+    gestureProgressRef.current = false;
+    gestureVolumeRef.current = false;
+    gestureBrightnessRef.current = false;
     currentDxRef.current = 0;
+    currentDyRef.current = 0;
     currentPositonRef.current = 0;
     setShowSeek(false);
   };
 
-  // 不拖动时要更新当前播放位置
+  //不拖动时要更新当前播放位置
   useEffect(() => {
-    if (!gestureMoveRef.current) {
+    if (!gestureProgressRef.current) {
       setCurrentPositon(current);
     }
   }, [current]);
@@ -264,10 +396,6 @@ function ControlerView({
     };
   }, []);
 
-  const [_, clear, set] = useTimeout(() => {
-    setVisible(false);
-  }, controlerDismissTime);
-
   useEffect(() => {
     Animated.timing(animateValue, {
       toValue: visible ? 1 : 0,
@@ -278,15 +406,35 @@ function ControlerView({
   }, [visible, animateValue]);
 
   const handlePressPlayer = () => {
-    setVisible((pre) => {
-      if (pre) {
-        clear();
-        return false;
+    // 先执行单击延时，如果是双击，在双击里取消单击定时器
+    //单击
+    if (!timerRef.current) {
+      timerRef.current = setTimeout(() => {
+        setVisible((pre) => {
+          if (pre) {
+            clear();
+            return false;
+          } else {
+            set();
+            return true;
+          }
+        });
+        timerRef.current = undefined;
+      }, 300);
+    }
+    //双击
+    if (clickTimeRef.current && dayjs().valueOf() - clickTimeRef.current < 300) {
+      clearTimeout(timerRef.current);
+      timerRef.current = undefined;
+      clickTimeRef.current = undefined;
+      if (isPlayingRef.current) {
+        onPressPause();
       } else {
-        set();
-        return true;
+        onPressPlay();
       }
-    });
+    }
+    //更新点击时间
+    clickTimeRef.current = dayjs().valueOf();
   };
 
   return (
@@ -331,9 +479,32 @@ function ControlerView({
         </View>
       )}
 
+      {showVolume && (
+        <View style={styles.volumeContainer}>
+          <View style={styles.volumeBg}>
+            <ControlIcon type="feather" name="volume-2" />
+            <View style={styles.volumeProgressCon}>
+              <View style={[styles.volumeProgress, { width: `${volumeValue * 100}%` }]} />
+            </View>
+          </View>
+        </View>
+      )}
+
+      {showBrightness && (
+        <View style={styles.volumeContainer}>
+          <View style={styles.volumeBg}>
+            <ControlIcon type="materialIcons" name="brightness-4" />
+            <View style={styles.volumeProgressCon}>
+              <View style={[styles.volumeProgress, { width: `${brightnessValue * 100}%` }]} />
+            </View>
+          </View>
+        </View>
+      )}
+
       <View style={styles.stateview} activeOpacity={1}>
         <GestureView
-          onPanResponderMove={onPanResponderMove}
+          // onPanResponderMove={onPanResponderMove}
+          onPanResponderMove={throttle(onPanResponderMove, 30)}
           onPanResponderRelease={onPanResponderRelease}
         >
           {showSeek && (
