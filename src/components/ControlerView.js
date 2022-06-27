@@ -245,7 +245,9 @@ function ControlerView({
 
   const onPanResponderMove = (e, gestureState) => {
     const { dx, dy, x0, y0 } = gestureState;
-    const width = Math.max(window.width, window.height);
+    const width = isFullRef.current
+      ? Math.max(window.width, window.height)
+      : Math.min(window.width, window.height);
     const height = 200;
     const widthE = width / 4;
     // 亮度
