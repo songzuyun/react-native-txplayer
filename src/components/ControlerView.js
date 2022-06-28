@@ -495,7 +495,7 @@ function ControlerView({
       {showBrightness && (
         <View style={styles.volumeContainer}>
           <View style={styles.volumeBg}>
-            <ControlIcon type="materialIcons" name="brightness-4" />
+            <ControlIcon type="material-icon" name="brightness-4" />
             <View style={styles.volumeProgressCon}>
               <View style={[styles.volumeProgress, { width: `${brightnessValue * 100}%` }]} />
             </View>
@@ -537,9 +537,11 @@ function ControlerView({
       >
         <LinearGradient style={StyleSheet.absoluteFill} colors={[GradientWhite, GradientBlack]} />
         <ControlIcon
+          type={'ionicon'}
           onPress={isPlaying ? onPressPause : onPressPlay}
-          name={isPlaying ? 'pausecircleo' : 'playcircleo'}
+          name={isPlaying ? 'pause-outline' : 'play'}
         />
+
         <Text style={styles.textTime}>{`${currentPositonFormat.M}:${currentPositonFormat.S}`}</Text>
         <Slider
           progress={currentPositon}

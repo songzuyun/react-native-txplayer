@@ -58,7 +58,7 @@ function StateView({
   if (!isPlaying) {
     view = (
       <View>
-        <ControlIcon onPress={onPressPlay} size={40} name="playcircleo" />
+        <ControlIcon type={'ionicon'} onPress={onPressPlay} size={40} name="play" />
       </View>
     );
   }
@@ -69,7 +69,7 @@ function StateView({
           style={styles.textError}
           numberOfLines={1}
           ellipsizeMode="tail"
-          >{`播放出错:${message}`}</Text>
+        >{`播放出错:${message}`}</Text>
         <Button
           title="重试"
           titleStyle={{ fontSize: 12 }}
