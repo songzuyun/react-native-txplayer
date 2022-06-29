@@ -39,6 +39,7 @@ const Player = forwardRef(
       showControlerView,
       isShowLeftBack,
       onPressBack,
+      isAdEnd,
       ...restProps
     },
     ref
@@ -280,6 +281,7 @@ const Player = forwardRef(
                 title={title}
                 isFull={isFull}
                 isShowLeftBack={isShowLeftBack}
+                isAdEnd={isAdEnd}
                 current={current}
                 buffer={buffer}
                 total={total}
@@ -341,6 +343,7 @@ Player.propTypes = {
   showControlerView: PropTypes.bool, // 是否显示控制层
   isShowLeftBack: PropTypes.bool, // 是否显示左返回按钮
   onPressBack: PropTypes.func, // 返回回调
+  isAdEnd:PropTypes.bool,//播放广告结束
 };
 
 Player.defaultProps = {
@@ -362,6 +365,7 @@ Player.defaultProps = {
   initFull: false,
   showControlerView: true,
   isShowLeftBack: false,
+  isAdEnd: false,
   onPressBack: () => {},
 };
 

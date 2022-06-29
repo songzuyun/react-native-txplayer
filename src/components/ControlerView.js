@@ -161,6 +161,7 @@ function ControlerView({
   onCastClick,
   isShowLeftBack,
   onPressBack,
+  isAdEnd,
 }) {
   const { screen, window } = useDimensions();
   const [visible, setVisible] = useState(false);
@@ -517,6 +518,7 @@ function ControlerView({
         </GestureView>
 
         <StateView
+          isAdEnd={isAdEnd}
           isError={isError}
           isLoading={isLoading}
           errorObj={errorObj}

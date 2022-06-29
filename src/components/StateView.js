@@ -40,6 +40,7 @@ function StateView({
   onPressPlay,
   onPressReload,
   themeColor,
+  isAdEnd,
 }) {
   const { percent } = loadingObj;
   const { message } = errorObj;
@@ -59,6 +60,17 @@ function StateView({
     view = (
       <View>
         <ControlIcon type={'ionicon'} onPress={onPressPlay} size={40} name="play" />
+      </View>
+    );
+  }
+  if (isAdEnd) {
+    view = (
+      <View style={styles.stateViewLoading}>
+        <ActivityIndicator size="large" color={themeColor} />
+        <Text style={styles.textLoading}>
+          <Text>缓冲中...</Text>
+          {!!percent && <Text>{`${percent}%`}</Text>}
+        </Text>
       </View>
     );
   }
