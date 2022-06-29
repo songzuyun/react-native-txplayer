@@ -255,7 +255,7 @@ function ControlerView({
       !gestureProgressRef.current &&
       !gestureBrightnessRef.current &&
       !gestureVolumeRef.current &&
-      Math.abs(dy) > 5 &&
+      Math.abs(dy) > 10 &&
       x0 < widthE * 2
     ) {
       gestureBrightnessRef.current = true;
@@ -265,7 +265,7 @@ function ControlerView({
       !gestureProgressRef.current &&
       !gestureBrightnessRef.current &&
       !gestureVolumeRef.current &&
-      Math.abs(dy) > 5 &&
+      Math.abs(dy) > 10 &&
       x0 > widthE * 2
     ) {
       gestureVolumeRef.current = true;
