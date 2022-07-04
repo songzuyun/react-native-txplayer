@@ -162,6 +162,7 @@ function ControlerView({
   isShowLeftBack,
   onPressBack,
   isAdEnd,
+  isPauseHideControlView, //是否暂停时立即隐藏控制栏
 }) {
   const { screen, window } = useDimensions();
   const [visible, setVisible] = useState(false);
@@ -408,6 +409,14 @@ function ControlerView({
     }).start();
   }, [visible, animateValue]);
 
+  const handlePressPause = () => {
+    if (isPauseHideControlView) {
+      setVisible(false);
+      clear();
+    }
+    onPressPause();
+  };
+
   const handlePressPlayer = () => {
     // 先执行单击延时，如果是双击，在双击里取消单击定时器
     //单击
@@ -431,7 +440,7 @@ function ControlerView({
       timerRef.current = undefined;
       clickTimeRef.current = undefined;
       if (isPlayingRef.current) {
-        onPressPause();
+        handlePressPause();
       } else {
         onPressPlay();
       }
@@ -540,7 +549,7 @@ function ControlerView({
         <LinearGradient style={StyleSheet.absoluteFill} colors={[GradientWhite, GradientBlack]} />
         <ControlIcon
           type={'ionicon'}
-          onPress={isPlaying ? onPressPause : onPressPlay}
+          onPress={isPlaying ? handlePressPause : onPressPlay}
           name={isPlaying ? 'pause-outline' : 'play'}
         />
 

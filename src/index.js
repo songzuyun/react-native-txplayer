@@ -40,6 +40,8 @@ const Player = forwardRef(
       isShowLeftBack,
       onPressBack,
       isAdEnd,
+      onPause,
+      isPauseHideControlView,
       ...restProps
     },
     ref
@@ -131,11 +133,13 @@ const Player = forwardRef(
         playerRef.current.startPlay();
       }
       setIsPlaying(true);
+      onPause(false);
     };
 
     const handlePause = () => {
       playerRef.current.pausePlay();
       setIsPlaying(false);
+      onPause(true);
     };
 
     const handleReload = () => {
@@ -247,6 +251,7 @@ const Player = forwardRef(
               setIsPlaying(true);
               setIsStart(true);
               onRenderingStart();
+              setIsComplate(false);
             }}
             onTXVodProgress={({ nativeEvent }) => {
               setTotal(nativeEvent.duration);
@@ -307,6 +312,7 @@ const Player = forwardRef(
                 onChangeBitrate={handleChangeBitrate}
                 onChangeQuality={handleChangeQuality}
                 onPressBack={handlePressBack}
+                isPauseHideControlView={isPauseHideControlView}
               />
             )}
           </TXViewPlayer>
@@ -343,7 +349,8 @@ Player.propTypes = {
   showControlerView: PropTypes.bool, // 是否显示控制层
   isShowLeftBack: PropTypes.bool, // 是否显示左返回按钮
   onPressBack: PropTypes.func, // 返回回调
-  isAdEnd:PropTypes.bool,//播放广告结束
+  isAdEnd: PropTypes.bool, //播放广告结束
+  onPause: PropTypes.func, // 暂停监听
 };
 
 Player.defaultProps = {
@@ -367,6 +374,7 @@ Player.defaultProps = {
   isShowLeftBack: false,
   isAdEnd: false,
   onPressBack: () => {},
+  onPause: () => {},
 };
 
 export default React.memo(Player);
