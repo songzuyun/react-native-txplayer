@@ -31,7 +31,9 @@
   [self.player resume];
 }
 -(void)pausePlay{
-  [self.player pause];
+  if(self.player.isPlaying){
+    [self.player pause];
+  }
 }
 -(void)stopPlay{
   [self.player stopPlay];
