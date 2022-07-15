@@ -38,6 +38,7 @@ const Player = forwardRef(
       initFull,
       showControlerView,
       isShowLeftBack,
+      isHideBtmProgress,
       onPressBack,
       isAdEnd,
       onPause,
@@ -302,6 +303,8 @@ const Player = forwardRef(
                 qualityList={qualityList}
                 bitrateList={bitrateList}
                 bitrateIndex={bitrateIndex}
+                isPauseHideControlView={isPauseHideControlView}
+                isHideBtmProgress={isHideBtmProgress}
                 onSlide={handleSlide}
                 onPressPlay={handlePlay}
                 onPressPause={handlePause}
@@ -312,7 +315,6 @@ const Player = forwardRef(
                 onChangeBitrate={handleChangeBitrate}
                 onChangeQuality={handleChangeQuality}
                 onPressBack={handlePressBack}
-                isPauseHideControlView={isPauseHideControlView}
               />
             )}
           </TXViewPlayer>
@@ -350,6 +352,7 @@ Player.propTypes = {
   isShowLeftBack: PropTypes.bool, // 是否显示左返回按钮
   onPressBack: PropTypes.func, // 返回回调
   isAdEnd: PropTypes.bool, //播放广告结束
+  isHideBtmProgress: PropTypes.bool, // 是否隐藏底部进度条
   onPause: PropTypes.func, // 暂停监听
 };
 
@@ -373,6 +376,7 @@ Player.defaultProps = {
   showControlerView: true,
   isShowLeftBack: false,
   isAdEnd: false,
+  isHideBtmProgress: false,
   onPressBack: () => {},
   onPause: () => {},
 };

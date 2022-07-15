@@ -163,6 +163,7 @@ function ControlerView({
   onPressBack,
   isAdEnd,
   isPauseHideControlView, //是否暂停时立即隐藏控制栏
+  isHideBtmProgress,
 }) {
   const { screen, window } = useDimensions();
   const [visible, setVisible] = useState(false);
@@ -573,7 +574,12 @@ function ControlerView({
           />
         )}
       </AnimateView>
-      <Progress disable={visible} value={currentPositon} maxValue={total} themeColor={themeColor} />
+      <Progress
+        disable={isHideBtmProgress ? true : visible}
+        value={currentPositon}
+        maxValue={total}
+        themeColor={themeColor}
+      />
       <ConfigView
         config={configObj}
         visible={configVisible}
