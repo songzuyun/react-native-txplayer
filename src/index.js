@@ -196,7 +196,17 @@ const Player = forwardRef(
     };
 
     return (
-      <View style={[styles.base, isFull ? { width: screen.width, height: screen.height } : style]}>
+      <View
+        style={[
+          styles.base,
+          isFull
+            ? {
+                width: Math.max(screen.width, screen.height),
+                height: Math.min(screen.width, screen.height),
+              }
+            : style,
+        ]}
+      >
         <TXViewPlayer
           {...restProps}
           ref={playerRef}

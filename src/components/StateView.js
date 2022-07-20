@@ -44,6 +44,9 @@ function StateView({
 }) {
   const { percent } = loadingObj;
   const { message } = errorObj;
+  let showMessage = '播放出错';
+  if (message) showMessage = `播放出错:${message}`;
+
   let view = null;
   if (isLoading) {
     view = (
@@ -77,15 +80,13 @@ function StateView({
   if (isError) {
     view = (
       <View style={styles.stateViewError}>
-        <Text
-          style={styles.textError}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >{`播放出错:${message}`}</Text>
+        <Text style={styles.textError} numberOfLines={1} ellipsizeMode="tail">
+          {showMessage}
+        </Text>
         <Button
           title="重试"
           titleStyle={{ fontSize: 12 }}
-          buttonStyle={{ width: 80, height: 30, backgroundColor: themeColor }}
+          buttonStyle={{ paddingHorizontal: 24, backgroundColor: themeColor }}
           onPress={onPressReload}
         />
       </View>
