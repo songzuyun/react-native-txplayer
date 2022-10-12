@@ -14,7 +14,8 @@ Pod::Spec.new do |s|
 
 
   s.dependency "React"
-  s.dependency "TXLiteAVSDK_Professional"
+  # 10.7之后需要强制验证License，无法播放
+  s.dependency "TXLiteAVSDK_Professional","10.6.11822"
 
 end
 

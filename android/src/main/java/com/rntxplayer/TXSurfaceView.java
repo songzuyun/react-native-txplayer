@@ -51,10 +51,10 @@ public class TXSurfaceView extends FrameLayout {
 
     public void setSource(String src) {
         playSource = src;
-        txyunVodPlayer.startVodPlay(src);
+        txyunVodPlayer.startPlay(src);
     }
 
     public void reloadPlay() {
-        txyunVodPlayer.startVodPlay(playSource);
+        txyunVodPlayer.startPlay(playSource);
     }
 }

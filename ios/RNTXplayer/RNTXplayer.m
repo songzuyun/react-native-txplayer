@@ -39,7 +39,7 @@
   [self.player stopPlay];
 }
 -(void)reloadPlay{
-  [self.player startVodPlay:self.source];
+  [self.player startPlay:self.source];
 }
 -(void)restartPlay{
   [self.player seek:0];
@@ -63,7 +63,7 @@
   [self.player setConfig:self.config];
   [self.player seek:0];
   [self.player resume];
-  [self.player startVodPlay:self.source];
+  [self.player startPlay:self.source];
 }
 -(void)setSetAutoPlay:(BOOL)setAutoPlay{
   _setAutoPlay = setAutoPlay;
