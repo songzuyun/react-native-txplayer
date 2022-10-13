@@ -1,11 +1,21 @@
 import React, { useRef, useEffect, useMemo } from 'react';
+import { View } from 'react-native';
 import Slider, { Ballon } from 'react-native-reanimated-slider';
 import Animated from 'react-native-reanimated';
 import { formatTime } from '../lib/utils';
 
 const { Value } = Animated;
 
-function VideoSlide({ style, progress, min, max, themeColor, cache, ...restProps }) {
+function VideoSlide({
+  style,
+  progress,
+  min,
+  max,
+  themeColor,
+  cache,
+  onSlidingChange,
+  ...restProps
+}) {
   const ballonRef = useRef();
 
   const valueMin = useMemo(() => new Value(0), []);
@@ -21,7 +31,21 @@ function VideoSlide({ style, progress, min, max, themeColor, cache, ...restProps
   }, [max, min, progress, cache, valueMin, valueMax, valueProgress, valueCache]);
 
   const renderBallon = () => {
-    return <Ballon ref={ballonRef} color={themeColor} textStyle={{ color: 'white' }} />;
+    // return <Ballon ref={ballonRef} color={themeColor} textStyle={{ color: 'white' }} />;
+    return null;
+  };
+
+  const renderThumbImage = () => {
+    return (
+      <View
+        style={{
+          backgroundColor: themeColor,
+          height: 10,
+          width: 10,
+          borderRadius: 5,
+        }}
+      />
+    );
   };
 
   return (
@@ -40,8 +64,11 @@ function VideoSlide({ style, progress, min, max, themeColor, cache, ...restProps
         return `${formatValue.M}:${formatValue.S}`;
       }}
       renderBallon={renderBallon}
-      renderThumbImage={() => {}}
-      setBallonText={(text) => ballonRef.current.setText(text)}
+      renderThumbImage={renderThumbImage}
+      setBallonText={(text) => {
+        onSlidingChange && onSlidingChange(text);
+        // ballonRef.current.setText(text)
+      }}
       {...restProps}
     />
   );

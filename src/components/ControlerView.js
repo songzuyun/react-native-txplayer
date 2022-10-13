@@ -558,11 +558,18 @@ function ControlerView({
         <Slider
           progress={currentPositon}
           min={0}
-          max={total - 10} //减去10秒，1.拖到最后疫苗会闪退2.留一点播放时间
+          max={total}
           cache={buffer}
           style={styles.bottomSlide}
           onSlidingComplete={(value) => {
             onSlide(parseInt(value));
+          }}
+          onSlidingChange={(value) => {
+            if (value.indexOf(':')) {
+              const positonArr = value && value.split(':');
+              const positon = Number(positonArr[0]) * 60 + Number(positonArr[1]);
+              setCurrentPositon(positon);
+            }
           }}
           themeColor={themeColor}
         />
