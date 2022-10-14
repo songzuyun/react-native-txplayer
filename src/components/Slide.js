@@ -40,9 +40,9 @@ function VideoSlide({
       <View
         style={{
           backgroundColor: themeColor,
-          height: 10,
-          width: 10,
-          borderRadius: 5,
+          height: 8,
+          width: 8,
+          borderRadius: 4,
         }}
       />
     );
@@ -55,6 +55,7 @@ function VideoSlide({
       max={valueMax}
       progress={valueProgress}
       cache={valueCache}
+      trackHeight={3}
       minimumTrackTintColor={themeColor}
       cacheTrackTintColor="#bbb"
       thumbTintColor="white"
