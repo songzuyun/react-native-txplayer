@@ -245,6 +245,9 @@ function ControlerView({
   const currentPositonRef = useRef(0); //拖动时当前播放位置，用于释放时seek（onSlide）
   const clickTimeRef = useRef(); //点击时间
   const timerRef = useRef(); //定时器（区分单击还是双击）
+  const sliderClickTimeRef = useRef(); //滑块点击时间
+  const slidertimerRef = useRef(); //滑块点击定时器（区分单击还是长按）
+  const isLongPresssliderRef = useRef(false); //是否长按滑块
 
   const onPanResponderMove = (e, gestureState) => {
     const { dx, dy, x0, y0 } = gestureState;
@@ -563,12 +566,36 @@ function ControlerView({
           style={styles.bottomSlide}
           onSlidingComplete={(value) => {
             onSlide(parseInt(value));
+            //重置滑动相关变量
+            clearTimeout(slidertimerRef.current);
+            slidertimerRef.current = undefined;
+            sliderClickTimeRef.current = undefined;
+            isLongPresssliderRef.current = false;
+            setShowSeek(false);
           }}
           onSlidingChange={(value) => {
             if (value.indexOf(':')) {
+              //重置滑块时间
+              set();
+              //更新当前时间
               const positonArr = value && value.split(':');
               const positon = Number(positonArr[0]) * 60 + Number(positonArr[1]);
               setCurrentPositon(positon);
+              //判断长按
+              if (!sliderClickTimeRef.current) {
+                sliderClickTimeRef.current = dayjs().valueOf();
+              }
+              if (!slidertimerRef.current) {
+                slidertimerRef.current = setTimeout(() => {
+                  if (dayjs().valueOf() - sliderClickTimeRef.current > 300) {
+                    isLongPresssliderRef.current = true;
+                  }
+                }, 500);
+              }
+              //长按显示时间
+              if (isLongPresssliderRef.current) {
+                setShowSeek(true);
+              }
             }
           }}
           themeColor={themeColor}
