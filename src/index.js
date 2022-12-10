@@ -202,7 +202,7 @@ const Player = forwardRef(
           isFull
             ? {
                 width: Math.max(screen.width, screen.height),
-                height: Math.min(screen.width, screen.height),
+                height: Math.min(window.width, window.height),
               }
             : style,
         ]}
