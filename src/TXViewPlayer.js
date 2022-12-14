@@ -95,7 +95,7 @@ TXViewPlayer.propTypes = {
 TXViewPlayer.defaultProps = {
   setAutoPlay: false,
   setRenderMode: 0,
-  setSmoothSwitchBitrate: false,
+  setSmoothSwitchBitrate: true,
 };
 
 const RCTVideo = requireNativeComponent('RNTXplayer');

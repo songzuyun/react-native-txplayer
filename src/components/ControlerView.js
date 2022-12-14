@@ -636,8 +636,8 @@ function ControlerView({
         bitrateList={bitrateList}
         bitrateIndex={bitrateIndex}
         onChange={(res) => {
-          onChangeQuality(res.value);
-          onChangeBitrate(res.value);
+          hasQuality && onChangeQuality(res.value);
+          hasBitrate && onChangeBitrate(res.value);
           setQualityVisible(false);
         }}
         onClose={() => setQualityVisible(false)}
