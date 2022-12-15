@@ -3,11 +3,16 @@ import { Text, View, StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row' },
+  textCon: {
+    borderWidth: 1.5,
+    borderColor: 'white',
+    borderRadius: 3,
+    paddingHorizontal: 6,
+    marginLeft: 30,
+  },
   text: {
     color: 'white',
-    marginLeft: 5,
-    paddingHorizontal: 10,
-    fontSize: 18,
+    fontSize: 16,
   },
 });
 function ChooseList({ data = [], themeColor, defaultValue, onChange }) {
@@ -25,9 +30,11 @@ function ChooseList({ data = [], themeColor, defaultValue, onChange }) {
       }
     };
     return (
-      <Text key={item.value} style={[styles.text, isSelect && selectStyle]} onPress={handlePress}>
-        {item.label}
-      </Text>
+      <View style={styles.textCon}>
+        <Text key={item.value} style={[styles.text, isSelect && selectStyle]} onPress={handlePress}>
+          {item.label}
+        </Text>
+      </View>
     );
   };
 

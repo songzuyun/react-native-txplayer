@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   },
   textWhite: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 22,
   },
   close: {
     marginTop: 5,
@@ -52,7 +52,7 @@ function QualityView({
     <SafeAreaView style={styles.quality}>
       <View style={styles.content} onPress={onClose}>
         <View style={styles.row}>
-          <Text style={styles.textWhite}>画质:</Text>
+          <Text style={styles.textWhite}>清晰度:</Text>
           <ChooseList
             data={qualityList || chooseData}
             defaultValue={playSource || bitrateIndex}

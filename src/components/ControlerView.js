@@ -39,9 +39,16 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
   },
+  textQualityCon: {
+    borderWidth: 1.5,
+    borderColor: 'white',
+    borderRadius: 3,
+    paddingHorizontal: 4,
+  },
   textQuality: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 13,
+    fontWeight: '500',
   },
   textTime: {
     color: 'white',
@@ -100,6 +107,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  changeBitrateText: {
+    color: 'white',
+    fontSize: 18,
+  },
   volumeBg: {
     backgroundColor: 'rgba(0,0,0,0.5)',
     paddingHorizontal: 10,
@@ -134,6 +145,7 @@ function ControlerView({
   playSource,
   bitrateList,
   bitrateIndex,
+  isChangingBitrate,
   qualityList,
   themeColor,
   poster,
@@ -379,8 +391,8 @@ function ControlerView({
     }
   }, [current]);
 
-  const bitrateLabel = getBitrateLabel(bitrate) || '画质';
-  const { label: qualityLabel } = quality || { label: '画质' };
+  const bitrateLabel = getBitrateLabel(bitrate) || '清晰度';
+  const { label: qualityLabel } = quality || { label: '清晰度' };
   const finalQualityLabel = hasQuality ? qualityLabel : bitrateLabel;
 
   const { animateValue, bottomAnimate, headerAnimate, opacityAnimate } = useMemo(() => {
@@ -468,12 +480,11 @@ function ControlerView({
         {isFull && <ControlIcon onPress={onPressFullOut} name="left" />}
         <Text style={styles.textTitle}>{title}</Text>
         {Boolean((hasQuality || hasBitrate) && isFull) && (
-          <Text
-            style={[styles.textQuality, styles.iconLeft]}
-            onPress={() => setQualityVisible(true)}
-          >
-            {finalQualityLabel}
-          </Text>
+          <View style={[styles.textQualityCon, styles.iconLeft]}>
+            <Text style={styles.textQuality} onPress={() => setQualityVisible(true)}>
+              {finalQualityLabel}
+            </Text>
+          </View>
         )}
         {enableCast && (
           <ControlIcon
@@ -515,6 +526,16 @@ function ControlerView({
               <View style={[styles.volumeProgress, { width: `${brightnessValue * 100}%` }]} />
             </View>
           </View>
+        </View>
+      )}
+
+      {(isChangingBitrate === 1 || isChangingBitrate === 2) && (
+        <View style={styles.volumeContainer}>
+          <Text style={{ fontSize: 16, color: themeColor, fontWeight: '500' }}>
+            {isChangingBitrate === 1
+              ? `正为您切换${finalQualityLabel}清晰度，请稍后...`
+              : `已切换为${finalQualityLabel}清晰度`}
+          </Text>
         </View>
       )}
 
