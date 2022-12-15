@@ -44,9 +44,19 @@ function QualityView({
     return null;
   }
 
+  //升序
+  const compare = (p) => {
+    return function (m, n) {
+      var a = m[p];
+      var b = n[p];
+      return a > b;
+    };
+  };
+
   const chooseData = bitrateList.map((o) => {
     return { value: o.index, label: getBitrateLabel(o) };
   });
+  const sortChooseData = chooseData.sort(compare('label'));
 
   return (
     <SafeAreaView style={styles.quality}>
@@ -54,8 +64,9 @@ function QualityView({
         <View style={styles.row}>
           <Text style={styles.textWhite}>清晰度:</Text>
           <ChooseList
-            data={qualityList || chooseData}
-            defaultValue={playSource || bitrateIndex}
+            data={qualityList || sortChooseData}
+            // defaultValue={playSource || bitrateIndex}
+            defaultValue={bitrateIndex}
             themeColor={themeColor}
             onChange={onChange}
           />

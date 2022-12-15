@@ -11,5 +11,5 @@ export const getBitrateLabel = (bitrate) => {
     return '';
   }
   const { width, height } = bitrate;
-  return `${Math.min(width, height)}p`;
+  return `${Math.min(width, height)}P`;
 };
