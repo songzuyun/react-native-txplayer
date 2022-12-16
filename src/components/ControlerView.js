@@ -501,6 +501,7 @@ function ControlerView({
           />
         )}
       </AnimateView>
+
       {!isFull && isShowLeftBack && (
         <View style={styles.leftBackContainer}>
           <ControlIcon onPress={onPressBack} name="left" />
@@ -531,7 +532,7 @@ function ControlerView({
 
       {(isChangingBitrate === 1 || isChangingBitrate === 2) && (
         <View style={styles.volumeContainer}>
-          <Text style={{ fontSize: 16, color: themeColor, fontWeight: '500' }}>
+          <Text style={{ fontSize: 16, color: 'white', fontWeight: '500' }}>
             {isChangingBitrate === 1
               ? `正为您切换${finalQualityLabel}清晰度，请稍后...`
               : `已切换为${finalQualityLabel}清晰度`}

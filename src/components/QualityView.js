@@ -49,7 +49,9 @@ function QualityView({
     return function (m, n) {
       var a = m[p];
       var b = n[p];
-      return a > b;
+      const numA = a.substring(0, a.length - 1);
+      const numB = b.substring(0, b.length - 1);
+      return Number(numA) > Number(numB);
     };
   };
 

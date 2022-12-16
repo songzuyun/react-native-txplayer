@@ -30,7 +30,7 @@ function ChooseList({ data = [], themeColor, defaultValue, onChange }) {
       }
     };
     return (
-      <View style={styles.textCon}>
+      <View style={[styles.textCon, isSelect && { borderColor: themeColor }]}>
         <Text key={item.value} style={[styles.text, isSelect && selectStyle]} onPress={handlePress}>
           {item.label}
         </Text>
