@@ -64,7 +64,6 @@ const Player = forwardRef(
     const [bitrateList, setBitrateList] = useState([]);
     const [bitrateIndex, setBitrateIndex] = useState();
     const [isChangingBitrate, setIsChangingBitrate] = useState(); // 1 start 2 finish
-    const autoChangeBitrate = useRef(false); // 播放器首次自动切换清晰度，此时不显示切换成功
 
     const { window, screen } = useDimensions();
     const currentAppState = useAppState();
@@ -269,13 +268,12 @@ const Player = forwardRef(
             if (hasQuality) return;
             setBitrateIndex(nativeEvent.index);
             onChangeBitrate(nativeEvent);
-            if (autoChangeBitrate.current) {
+            if (isChangingBitrate === 1) {
               setIsChangingBitrate(2);
               setTimeout(() => {
                 setIsChangingBitrate();
               }, 2000);
             }
-            autoChangeBitrate.current = true;
           }}
           onTXVodBitrateReady={({ nativeEvent }) => {
             if (hasQuality) return;
