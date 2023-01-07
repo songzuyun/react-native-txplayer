@@ -281,17 +281,22 @@ const Player = forwardRef(
             if (hasQuality) return;
             setBitrateList(nativeEvent.bitrates);
             // 全屏时自动切换最高清晰度
-            if (autoChangeMaxBitrate && isFull && !isFinishAutoChangeMaxBitrate.current) {
-              isFinishAutoChangeMaxBitrate.current = true;
-              const a = nativeEvent.bitrates;
-              var indexOfMax = 0;
-              var max = a.reduce(
-                (a, c, i) => (c.bitrate > a ? ((indexOfMax = i), c.bitrate) : a),
-                0
-              );
-              setIsChangingBitrate(1);
-              setBitrateIndex(nativeEvent.bitrates[indexOfMax].index);
-            }
+            setTimeout(() => {
+              if (autoChangeMaxBitrate && isFull && !isFinishAutoChangeMaxBitrate.current) {
+                isFinishAutoChangeMaxBitrate.current = true;
+                const a = nativeEvent.bitrates;
+                var indexOfMax = 0;
+                var max = a.reduce(
+                  (a, c, i) => (c.bitrate > a ? ((indexOfMax = i), c.bitrate) : a),
+                  0
+                );
+                const index = nativeEvent.bitrates[indexOfMax].index;
+                if (bitrateIndex !== index) {
+                  setIsChangingBitrate(1);
+                  setBitrateIndex();
+                }
+              }
+            }, 3000);
           }}
         >
           <StatusBar hidden={isHideStatusBar ? true : isFull} />
