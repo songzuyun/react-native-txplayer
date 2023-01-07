@@ -44,6 +44,7 @@ const Player = forwardRef(
       onPause,
       isPauseHideControlView,
       isHideStatusBar,
+      autoChangeMaxBitrate,
       ...restProps
     },
     ref
@@ -278,6 +279,17 @@ const Player = forwardRef(
           onTXVodBitrateReady={({ nativeEvent }) => {
             if (hasQuality) return;
             setBitrateList(nativeEvent.bitrates);
+            // 全屏时自动切换最高清晰度
+            if (autoChangeMaxBitrate && isFull) {
+              const a = nativeEvent.bitrates;
+              var indexOfMax = 0;
+              var max = a.reduce(
+                (a, c, i) => (c.bitrate > a ? ((indexOfMax = i), c.bitrate) : a),
+                0
+              );
+              setIsChangingBitrate(1);
+              setBitrateIndex(nativeEvent.bitrates[indexOfMax].index);
+            }
           }}
         >
           <StatusBar hidden={isHideStatusBar ? true : isFull} />
@@ -355,6 +367,7 @@ Player.propTypes = {
   isHideBtmProgress: PropTypes.bool, // 是否隐藏底部进度条
   onPause: PropTypes.func, // 暂停监听
   isHideStatusBar: PropTypes.bool, // 画中画是否隐藏状态栏显示
+  autoChangeMaxBitrate: PropTypes.bool, // 全屏时自动切换最高清晰度(m3u8)
 };
 
 Player.defaultProps = {
@@ -381,6 +394,7 @@ Player.defaultProps = {
   isHideStatusBar: false,
   onPressBack: () => {},
   onPause: () => {},
+  autoChangeMaxBitrate: false,
 };
 
 export default React.memo(Player);
