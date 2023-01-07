@@ -70,6 +70,7 @@ const Player = forwardRef(
     const currentAppState = useAppState();
     const isChangeQuality = useRef(false); // 切换清晰度
     const isChangeQualityCurrent = useRef(0); // 切换清晰度当前时间
+    const isFinishAutoChangeMaxBitrate = useRef(false); // 是否完成切换自动切换最高清晰度
 
     const hasQuality = Array.isArray(qualityList) && qualityList.length;
 
@@ -280,7 +281,8 @@ const Player = forwardRef(
             if (hasQuality) return;
             setBitrateList(nativeEvent.bitrates);
             // 全屏时自动切换最高清晰度
-            if (autoChangeMaxBitrate && isFull) {
+            if (autoChangeMaxBitrate && isFull && !isFinishAutoChangeMaxBitrate.current) {
+              isFinishAutoChangeMaxBitrate.current = true;
               const a = nativeEvent.bitrates;
               var indexOfMax = 0;
               var max = a.reduce(
