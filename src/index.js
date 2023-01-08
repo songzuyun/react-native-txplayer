@@ -293,10 +293,10 @@ const Player = forwardRef(
                 const index = nativeEvent.bitrates[indexOfMax].index;
                 if (bitrateIndex !== index) {
                   setIsChangingBitrate(1);
-                  setBitrateIndex();
+                  setBitrateIndex(index);
                 }
               }
-            }, 3000);
+            }, 1000);
           }}
         >
           <StatusBar hidden={isHideStatusBar ? true : isFull} />
