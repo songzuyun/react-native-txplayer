@@ -1,6 +1,7 @@
 import React, { forwardRef, useRef, useState, useEffect, useImperativeHandle } from 'react';
 import { StyleSheet, StatusBar, Image, View } from 'react-native';
 import PropTypes from 'prop-types';
+import { ImagePropTypes } from 'deprecated-react-native-prop-types';
 import { useBackHandler, useAppState, useDimensions } from '@react-native-community/hooks';
 import { hideNavigationBar, showNavigationBar } from 'react-native-navigation-bar-color';
 
@@ -351,7 +352,7 @@ Player.propTypes = {
       value: PropTypes.string, // 对应播放地址
     }) // 播放列表
   ),
-  poster: Image.propTypes.source, // 封面图
+  poster: ImagePropTypes.source, // 封面图
   onFullScreen: PropTypes.func, // 全屏回调事件
   onCompletion: PropTypes.func, // 播放完成事件
   enableFullScreen: PropTypes.bool, // 是否允许全屏
