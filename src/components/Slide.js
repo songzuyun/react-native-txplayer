@@ -4,7 +4,7 @@ import { View } from 'react-native';
 // import Animated from 'react-native-reanimated';
 import { formatTime } from '../lib/utils';
 
-const { Value } = Animated;
+// const { Value } = Animated;
 
 function VideoSlide({
   style,
