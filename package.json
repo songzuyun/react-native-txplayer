@@ -13,8 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@react-native-community/hooks": "^2.6.0",
-    "prop-types": "^15.7.2",
-    "react-native-elements": "^3.x.x"
+    "prop-types": "^15.7.2"
   },
   "devDependencies": {
     "react": "^16.13.1",
